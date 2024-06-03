@@ -78,18 +78,18 @@ extern "C" void _NativeShare_Share( const char* files[], int filesCount, const c
 	for( int i = 0; i < filesCount; i++ ) 
 	{
 		NSString *filePath = [NSString stringWithUTF8String:files[i]];
-        if ( filesCount == 1 && CHECK_IOS_VERSION(@"13.2.2") )
-        {
-            [items addObject:[NSURL fileURLWithPath:filePath]];
-        }
-        else
-        {
-            UIImage *image = [UIImage imageWithContentsOfFile:filePath];
-            if( image != nil )
-                [items addObject:image];
-            else
-                [items addObject:[NSURL fileURLWithPath:filePath]];
-        }
+		if ( filesCount == 1 && CHECK_IOS_VERSION(@"13.2.2") )
+		{
+			[items addObject:[NSURL fileURLWithPath:filePath]];
+		}
+		else
+		{
+			UIImage *image = [UIImage imageWithContentsOfFile:filePath];
+			if( image != nil )
+				[items addObject:image];
+			else
+				[items addObject:[NSURL fileURLWithPath:filePath]];
+		}
 	}
 	
 	if( strlen( subject ) == 0 && [items count] == 0 )
