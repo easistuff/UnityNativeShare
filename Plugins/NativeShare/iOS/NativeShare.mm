@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
-#ifdef UNITY_4_0 || UNITY_5_0
+#if defined(UNITY_4_0) || defined(UNITY_5_0)
 #import "iPhone_View.h"
 #else
 extern UIViewController* UnityGetGLViewController();
