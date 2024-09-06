@@ -21,18 +21,18 @@ namespace NativeShareNamespace
 		{
 			get
 			{
-				if( m_instance == null )
+				if (m_instance == null)
 				{
 					try
 					{
-						if( File.Exists( SAVE_PATH ) )
-							m_instance = JsonUtility.FromJson<Settings>( File.ReadAllText( SAVE_PATH ) );
+						if (File.Exists(SAVE_PATH))
+							m_instance = JsonUtility.FromJson<Settings>(File.ReadAllText(SAVE_PATH));
 						else
 							m_instance = new Settings();
 					}
-					catch( System.Exception e )
+					catch (System.Exception e)
 					{
-						Debug.LogException( e );
+						Debug.LogException(e);
 						m_instance = new Settings();
 					}
 				}
@@ -43,16 +43,16 @@ namespace NativeShareNamespace
 
 		public void Save()
 		{
-			File.WriteAllText( SAVE_PATH, JsonUtility.ToJson( this, true ) );
+			File.WriteAllText(SAVE_PATH, JsonUtility.ToJson(this, true));
 		}
 
 #if UNITY_2018_3_OR_NEWER
 		[SettingsProvider]
 		public static SettingsProvider CreatePreferencesGUI()
 		{
-			return new SettingsProvider( "Project/yasirkula/Native Share", SettingsScope.Project )
+			return new SettingsProvider("Project/yasirkula/Native Share", SettingsScope.Project)
 			{
-				guiHandler = ( searchContext ) => PreferencesGUI(),
+				guiHandler = (searchContext) => PreferencesGUI(),
 				keywords = new System.Collections.Generic.HashSet<string>() { "Native", "Share", "Android", "iOS" }
 			};
 		}
@@ -65,13 +65,13 @@ namespace NativeShareNamespace
 		{
 			EditorGUI.BeginChangeCheck();
 
-			Instance.AutomatedSetup = EditorGUILayout.Toggle( "Automated Setup", Instance.AutomatedSetup );
+			Instance.AutomatedSetup = EditorGUILayout.Toggle("Automated Setup", Instance.AutomatedSetup);
 
-			EditorGUI.BeginDisabledGroup( !Instance.AutomatedSetup );
-			Instance.PhotoLibraryUsageDescription = EditorGUILayout.DelayedTextField( new GUIContent( "Photo Library Usage Description", "Shown to user when they select the 'Save to Photos' option in share sheet" ), Instance.PhotoLibraryUsageDescription );
+			EditorGUI.BeginDisabledGroup(!Instance.AutomatedSetup);
+			Instance.PhotoLibraryUsageDescription = EditorGUILayout.DelayedTextField(new GUIContent("Photo Library Usage Description", "Shown to user when they select the 'Save to Photos' option in share sheet"), Instance.PhotoLibraryUsageDescription);
 			EditorGUI.EndDisabledGroup();
 
-			if( EditorGUI.EndChangeCheck() )
+			if (EditorGUI.EndChangeCheck())
 				Instance.Save();
 		}
 	}
@@ -80,28 +80,42 @@ namespace NativeShareNamespace
 	{
 #if UNITY_IOS
 		[PostProcessBuild]
-		public static void OnPostprocessBuild( BuildTarget target, string buildPath )
+		public static void OnPostprocessBuild(BuildTarget target, string buildPath)
 		{
-			if( !Settings.Instance.AutomatedSetup )
+			if (!Settings.Instance.AutomatedSetup)
 				return;
 
-			if( target == BuildTarget.iOS )
+			if (target == BuildTarget.iOS)
 			{
-				string plistPath = Path.Combine( buildPath, "Info.plist" );
+				string plistPath = Path.Combine(buildPath, "Info.plist");
 
 				PlistDocument plist = new PlistDocument();
-				plist.ReadFromString( File.ReadAllText( plistPath ) );
+				plist.ReadFromString(File.ReadAllText(plistPath));
 
 				PlistElementDict rootDict = plist.root;
-				if( !string.IsNullOrEmpty( Settings.Instance.PhotoLibraryUsageDescription ) )
+				if (!string.IsNullOrEmpty(Settings.Instance.PhotoLibraryUsageDescription))
 				{
-					rootDict.SetString( "NSPhotoLibraryUsageDescription", Settings.Instance.PhotoLibraryUsageDescription );
-					rootDict.SetString( "NSPhotoLibraryAddUsageDescription", Settings.Instance.PhotoLibraryUsageDescription );
+					rootDict.SetString("NSPhotoLibraryUsageDescription", Settings.Instance.PhotoLibraryUsageDescription);
+					rootDict.SetString("NSPhotoLibraryAddUsageDescription", Settings.Instance.PhotoLibraryUsageDescription);
 				}
 
-				File.WriteAllText( plistPath, plist.WriteToString() );
+				File.WriteAllText(plistPath, plist.WriteToString());
+
+				// Add LinkPresentation.framework to the project
+				string projectPath = PBXProject.GetPBXProjectPath(buildPath);
+				PBXProject project = new PBXProject();
+				project.ReadFromFile(projectPath);
+				string targetGUID = project.GetUnityFrameworkTargetGuid();
+
+				project.AddFrameworkToProject(targetGUID, "LinkPresentation.framework", true);
+
+				// Add `-ObjC` to "Other Linker Flags".
+				project.AddBuildProperty(targetGUID, "OTHER_LDFLAGS", "-ObjC");
+
+				project.WriteToFile(projectPath);
 			}
 		}
+
 #endif
 	}
 }
