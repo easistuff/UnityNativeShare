@@ -25,17 +25,11 @@ public class NativeShare
 		}
 	}
 
-	private static AndroidJavaObject m_context = null;
 	private static AndroidJavaObject Context
 	{
 		get
 		{
-			if( m_context == null )
-			{
-				m_context = UnityEngine.Android.AndroidApplication.UnityActivity;
-			}
-
-			return m_context;
+			return UnityEngine.Android.AndroidApplication.UnityActivity;
 		}
 	}
 #elif !UNITY_EDITOR && UNITY_IOS
