@@ -32,10 +32,7 @@ public class NativeShare
 		{
 			if( m_context == null )
 			{
-				using( AndroidJavaObject unityClass = new AndroidJavaClass( "com.unity3d.player.UnityPlayer" ) )
-				{
-					m_context = unityClass.GetStatic<AndroidJavaObject>( "currentActivity" );
-				}
+				m_context = UnityEngine.Android.AndroidApplication.UnityActivity;
 			}
 
 			return m_context;
