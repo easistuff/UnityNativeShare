@@ -29,7 +29,7 @@ public class NativeShare
 	{
 		get
 		{
-			return UnityEngine.Android.AndroidApplication.UnityActivity;
+			return UnityEngine.Android.AndroidApplication.currentActivity;
 		}
 	}
 #elif !UNITY_EDITOR && UNITY_IOS

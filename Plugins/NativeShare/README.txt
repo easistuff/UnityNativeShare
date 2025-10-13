@@ -1,4 +1,4 @@
-= Native Share for Android & iOS (v1.8.1) =
+= Native Share for Android & iOS (v1.8.2) =
 
 Documentation: https://github.com/easistuff/UnityNativeShare
 FAQ: https://github.com/easistuff/UnityNativeShare#faq
